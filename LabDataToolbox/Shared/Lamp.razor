@@ -1,0 +1,31 @@
+﻿<MTooltip Bottom>
+    <ActivatorContent>
+
+        <div @attributes="@context.Attrs" style="margin-right: 5px;">
+            <MLabel >
+                @Name
+            </MLabel>
+
+            <MAvatar Color=@Color>
+            </MAvatar>
+        </div>
+
+    </ActivatorContent>
+    <ChildContent>
+        <span>@Description</span>
+    </ChildContent>
+</MTooltip>
+
+@code {
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public bool Status { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+
+    private string Color => Status ? "green" : "red";
+}

@@ -1,0 +1,168 @@
+﻿@using LabDataToolbox.Model
+@using LabDataToolbox.Service
+@using LabDataToolbox.Util
+@using Microsoft.Extensions.Logging
+@using System.Diagnostics
+@inject IPopupService PopupService
+@inject AppConfigService AppConfigService
+@inject AdsDataLogService AdsDataLogService
+@inject ILogger<AdsDataLog> Logger
+@page "/AdsDataLog"
+
+
+<MCard Style="height:100%">
+    <MCardTitle Class="text-center justify-center py-6">
+        <h4 class="font-weight-bold text-h4">数据存储</h4>
+    </MCardTitle>
+    <MTabs @bind-Value="_tabs" Centered Grow>
+        <MTab>
+            <MCol>
+                <MIcon>fas fa-home</MIcon>
+                倍福连接配置
+            </MCol>
+        </MTab>
+        <MTab>
+            <MCol>
+                <MIcon>fas fa-home</MIcon>
+                数据记录配置
+            </MCol>
+        </MTab>
+    </MTabs>
+
+    <MTabsItems Value="_tabs">
+        <MTabItem>
+            <MCard Flat>
+                <MCardText>
+                    <MContainer>
+                        <MRow>
+                            <MCol Cols="12">
+                                <MTextField @bind-Value="AppConfig.AdsConfig.NetId" Label="NetId" TValue="string">
+                                </MTextField>
+                            </MCol>
+                            <MCol Cols="12" Sm="6">
+                                <MTextField @bind-Value="AppConfig.AdsConfig.PortId" Label="PortId" TValue="int">
+                                </MTextField>
+                            </MCol>
+                            <MCol Cols="12" Sm="6">
+                                <MTextField @bind-Value="AppConfig.AdsConfig.Period" Label="Period" TValue="int">
+                                </MTextField>
+                            </MCol>
+                            <MCol Cols="12" Sm="6">
+                                <MTextField @bind-Value="AppConfig.DataLogConfig.DataLogFolderName" Label="Folder"
+                                            TValue="string">
+                                </MTextField>
+                            </MCol>
+                            <MCol Cols="12" Sm="6">
+                                <MTextField @bind-Value="AppConfig.DataLogConfig.DataLogFileName" Label="FileName"
+                                            TValue="string">
+                                </MTextField>
+                            </MCol>
+                        </MRow>
+                        <MRow Align="AlignTypes.Center">
+
+                            <Lamp Status=@_isAdsConnected Name="倍福连接" Description="录数程序是否连接倍福Ads主机"></Lamp>
+
+                            <MSpacer></MSpacer>
+
+                            <MButton Flat Dark Color="primary"
+                                     OnClick="OnConnectAdsServer"
+                                     Style="margin-right: 5px;">
+                                连接倍福
+                            </MButton>
+
+                            <MButton Flat Dark Color="red"
+                                     OnClick="OnDisconnectAdsServer">
+                                断连倍福
+                            </MButton>
+                        </MRow>
+                    </MContainer>
+                </MCardText>
+
+            </MCard>
+
+        </MTabItem>
+        <MTabItem>
+            <MCard Flat>
+                <MCardTitle Class="text-h5">
+                    An even better title
+                </MCardTitle>
+                <MCardText>
+                    <p>
+                        Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra
+                        felis
+                        nunc et lorem. Sed hendrerit. Maecenas malesuada. Vestibulum ullamcorper mauris at ligula.
+                        Proin
+                        faucibus arcu quis ante.
+                    </p>
+
+                    <p class="mb-0">
+                        Etiam vitae tortor. Curabitur ullamcorper ultricies nisi. Sed magna purus, fermentum eu,
+                        tincidunt eu, varius ut, felis. Aliquam lobortis. Suspendisse potenti.
+                    </p>
+                </MCardText>
+            </MCard>
+        </MTabItem>
+    </MTabsItems>
+</MCard>
+
+@code {
+
+    public StringNumber _tabs;
+    private bool _isAdsConnected;
+
+    private AppConfig AppConfig { get; set; }
+    private AdsConfig AdsConfig { get; set; }
+    private DataLogConfig DataLogConfig { get; set; }
+
+    
+    protected override void OnInitialized()
+    {
+        LoadAppConfig();
+        PopupService.EnqueueSnackbarAsync("初始化完成");
+
+    }
+
+    private void OnConnectAdsServer()
+    {
+        if (!_isAdsConnected)
+        {
+            AdsDataLogService.ConnectAdsServer();
+        }
+
+        if (AdsDataLogService.IsAdsPortRun)
+        {
+            _isAdsConnected = true;
+            PopupService.EnqueueSnackbarAsync("倍福主机和录数程序已连接");
+        }
+        else
+        {
+            PopupService.EnqueueSnackbarAsync("请确认倍福是否Login并启动");
+        }
+    }
+
+    private void OnDisconnectAdsServer()
+    {
+        if (!_isAdsConnected)
+        {
+            PopupService.EnqueueSnackbarAsync("请先连接倍福主机和录数程序");
+            return;
+        }
+        ;
+        AdsDataLogService.DisconnectAdsServer();
+        _isAdsConnected = false;
+    }
+
+
+    #region Helper Functions
+
+    private void LoadAppConfig()
+    {
+        AppConfig = AppConfigService.AppConfig;
+        DataLogConfig = AppConfigService.AppConfig.DataLogConfig;
+        AdsConfig = AppConfigService.AppConfig.AdsConfig;
+        PopupService.EnqueueSnackbarAsync("读取AppConfig");
+    }
+
+    #endregion
+
+}
