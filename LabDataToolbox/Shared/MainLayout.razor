@@ -1,19 +1,32 @@
 ﻿@inherits LayoutComponentBase
 <MApp>
-    <MNavigationDrawer App Permanent ExpandOnHover @bind-MiniVariant="_mini">
+    <MNavigationDrawer App Permanent Width="80">
         <div class="d-flex flex-column" style="height: inherit">
             <MList Nav Routable Dense>
                 <MListItem Href="/" ActiveClass="primary--text">
-
                     <MListItemContent>
-                        <MListItemTitle>AdsSymbolSelect</MListItemTitle>
+                        <MListItemIcon>
+                            <MIcon>fas fa-database</MIcon>
+                        </MListItemIcon>
+                        <MListItemSubtitle>Log</MListItemSubtitle>
+                    </MListItemContent>
+                </MListItem>
+                <MListItem Href="/AdsDataLog" ActiveClass="primary--text">
+                    <MListItemContent>
+                        <MListItemIcon>
+                            <MIcon>fas fa-database</MIcon>
+                        </MListItemIcon>
+                        <MListItemSubtitle>Log1</MListItemSubtitle>
                     </MListItemContent>
                 </MListItem>
             </MList>
             <MList Nav Routable Dense Class="mt-auto">
                 <MListItem Href="/setting" ActiveClass="primary--text">
                     <MListItemContent>
-                        <MListItemTitle>Setting</MListItemTitle>
+                        <MListItemIcon>
+                            <MIcon>fas fa-cog</MIcon>
+                        </MListItemIcon>
+                        <MListItemTitle>设置</MListItemTitle>
                     </MListItemContent>
                 </MListItem>
             </MList>
@@ -21,7 +34,7 @@
 
     </MNavigationDrawer>
     <MMain>
-        <MContainer Fluid>
+        <MContainer Fluid Style="height:100%">
             <MErrorHandler>
                 @Body
             </MErrorHandler>
@@ -30,5 +43,5 @@
 </MApp>
 
 @code {
-    private bool _mini = true;
+
 }

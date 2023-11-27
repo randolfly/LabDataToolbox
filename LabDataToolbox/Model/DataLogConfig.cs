@@ -8,7 +8,7 @@ public class DataLogConfig
     public string DataLogFolderName { get; set; } =
         Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
-    public string DataLogFileName { get; set; } = "hello.csv";
+    public string DataLogFileName { get; set; } = "hello";
 
     public List<string> RecordAdsSymbolName { get; set; } = new();
     public List<string> GraphAdsSymbolName { get; set; } = new();

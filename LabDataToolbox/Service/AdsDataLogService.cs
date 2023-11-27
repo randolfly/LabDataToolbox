@@ -5,7 +5,6 @@
 // @Date: 2023-07-28 19:20
 // @Modify:
 
-
 namespace LabDataToolbox.Service;
 
 using BlazorComponent;
@@ -31,14 +30,13 @@ public class AdsDataLogService : IDisposable
     {
         AppConfigService = appConfigService;
         AdsConfig = appConfigService.AppConfig.AdsConfig;
-        FileSaveTimer = new FileSaveTimer(BackupCsvLog);
+        PeriodicActionTimer = new PeriodicActionTimer(BackupCsvLog);
     }
 
-    public AppConfigService AppConfigService { get; set; }
-
+    private AppConfigService AppConfigService { get; set; }
     private bool IsAdsConnected => AdsClient.IsConnected;
-
-    public bool IsAdsPortReady
+    
+    public bool IsAdsPortRun
     {
         get
         {
@@ -59,15 +57,13 @@ public class AdsDataLogService : IDisposable
     private AdsClient AdsClient { get; } = new();
     private AdsConfig AdsConfig { get; set; } = new();
     private List<List<double>> RecordData { get; } = new();
-
     public List<SymbolInfo> RecordSymbolInfos { get; set; } = new();
     public List<SymbolInfo> GraphSymbolInfos { get; set; } = new();
-
     private Dictionary<uint, SymbolInfo> RecordSymbolInfoDictionary { get; } = new();
     public Dictionary<SymbolInfo, FigureViewWindow> FigureViewWindowDictionary { get; set; } = new();
 
     // Add recurrent save file action
-    public FileSaveTimer FileSaveTimer { get; set; }
+    public PeriodicActionTimer PeriodicActionTimer { get; set; }
     public bool ExportCsvTempWithHeader { get; set; } = true;
     public int StartId { get; set; } = 0;
     public int EndId { get; set; }
@@ -75,7 +71,7 @@ public class AdsDataLogService : IDisposable
     public void Dispose()
     {
         AdsClient.Dispose();
-        FileSaveTimer.Dispose();
+        PeriodicActionTimer.Dispose();
     }
 
     public void ConnectAdsServer()
@@ -93,7 +89,6 @@ public class AdsDataLogService : IDisposable
         if (RecordSymbolInfos.Count <= 0) return;
         // update ads config
         AdsConfig = AppConfigService.AppConfig.AdsConfig;
-
         RecordData.Clear();
         RecordSymbolInfoDictionary.Clear();
         FigureViewWindowDictionary.Values.ForEach(w => w.Close());
@@ -120,7 +115,7 @@ public class AdsDataLogService : IDisposable
         ShowGraphView(GraphSymbolInfos);
         ExportCsvTempWithHeader = true;
         StartId = 0;
-        FileSaveTimer.StartTimer();
+        PeriodicActionTimer.StartTimer();
     }
 
     public async Task UnregisterNotification(string logDataFullName)
@@ -131,9 +126,10 @@ public class AdsDataLogService : IDisposable
         {
             figureViewWindow.ScaleRangeToMax();
         }
+
         AdsClient.AdsNotification -= AdsNotificationHandler;
         await ExportCsvLog(logDataFullName);
-        FileSaveTimer.StopTimer();
+        PeriodicActionTimer.StopTimer();
     }
 
     public List<SymbolInfoTree> GetSymbolInfoTree()
@@ -153,7 +149,6 @@ public class AdsDataLogService : IDisposable
             var symbolInfoTree = symbolInfoTreeList[symbolIndex];
             symbolIndex++;
             LoadSymbolInfoTree(symbol, ref symbolInfoTree);
-
         }
 
         return symbolInfoTreeList;
@@ -161,7 +156,6 @@ public class AdsDataLogService : IDisposable
         static void LoadSymbolInfoTree(Symbol symbol, ref SymbolInfoTree symbolInfoTree)
         {
             symbolInfoTree.SymbolInfo = symbol.ParseSymbol();
-
             symbolInfoTree.Children = new List<SymbolInfoTree>(symbol.SubSymbolCount);
             for (var i = 0; i < symbol.SubSymbolCount; i++)
             {
@@ -178,25 +172,21 @@ public class AdsDataLogService : IDisposable
         {
             figureViewWindow.CloseWindow();
         }
+
         FigureViewWindowDictionary.Clear();
         for (var i = 0; i < graphSymbolInfos.Count; i++)
         {
             var symbolInfo = graphSymbolInfos[i];
             FigureViewWindow.LogPeriod = AdsConfig.Period;
             var (left, top) = GetGraphViewWindowPos(i, graphSymbolInfos.Count);
-            var figureViewWindow = new FigureViewWindow
-            {
-                Title = symbolInfo.Path,
-                Left = left,
-                Top = top
-            };
+            var figureViewWindow = new FigureViewWindow { Title = symbolInfo.Path, Left = left, Top = top };
             FigureViewWindowDictionary.Add(symbolInfo, figureViewWindow);
             figureViewWindow.Show();
         }
-
     }
 
-    private static (double x, double y) GetGraphViewWindowPos(int id, int windowNum, int windowWidth = 600, int windowHeight = 300)
+    private static (double x, double y) GetGraphViewWindowPos(int id, int windowNum, int windowWidth = 600,
+        int windowHeight = 300)
     {
         const int windowRowSize = 3;
         var desktopWorkingArea = SystemParameters.WorkArea;
@@ -216,7 +206,6 @@ public class AdsDataLogService : IDisposable
             8 => BinaryPrimitives.ReadDoubleLittleEndian(e.Data.Span),
             _ => 0
         };
-
         var symbol = RecordSymbolInfoDictionary[e.Handle];
         lock (_recordDataLock)
         {
@@ -233,7 +222,7 @@ public class AdsDataLogService : IDisposable
     private async void BackupCsvLog()
     {
         var backupFileName = AppConfigService.AppConfig.DataLogConfig.TempFileFullName + ".tmp";
-        EndId = StartId + (int)((double)(FileSaveTimer.TimeInterval) / (double)(AdsConfig.Period));
+        EndId = StartId + (int)((double)(PeriodicActionTimer.TimeInterval) / (double)(AdsConfig.Period));
         await ExportCsvLog(backupFileName, StartId, EndId, ExportCsvTempWithHeader);
         StartId = EndId;
         ExportCsvTempWithHeader = false;
@@ -260,6 +249,7 @@ public class AdsDataLogService : IDisposable
         {
             sb.AppendLine(string.Join(',', RecordSymbolInfos.Select(s => s.Path)));
         }
+
         var maxLength = RecordData.Where(d => d.Count > 0).Select(d => d.Count).Min();
         endId = endId < maxLength ? endId : maxLength;
         for (var i = startId; i < endId; i++)

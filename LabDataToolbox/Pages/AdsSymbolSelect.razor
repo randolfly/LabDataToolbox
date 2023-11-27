@@ -59,9 +59,9 @@
             <AdsSettingDialog AppConfig="AppConfig"/>
             <MButton Class="ma-2" OnClick="OnConnectAdsServer"
                      Outlined
-                     Color=@(AdsDataLogService.IsAdsPortReady ? "green" : "red")
+                     Color=@(AdsDataLogService.IsAdsPortRun ? "green" : "red")
                      Dark>
-                @(AdsDataLogService.IsAdsPortReady ? "Disconnect" : "Connect")
+                @(AdsDataLogService.IsAdsPortRun ? "Disconnect" : "Connect")
             </MButton>
             <MButton Class="ma-2" OnClick="OnAdsLog"
                      Outlined
@@ -109,7 +109,7 @@
 
     private void OnConnectAdsServer()
     {
-        if (!AdsDataLogService.IsAdsPortReady)
+        if (!AdsDataLogService.IsAdsPortRun)
         {
             AdsDataLogService.ConnectAdsServer();
             _isAdsConnected = true;
@@ -125,7 +125,7 @@
     {
         if (!_isAdsLogging)
         {
-            if (AdsDataLogService.IsAdsPortReady)
+            if (AdsDataLogService.IsAdsPortRun)
             {
                 if (_recordSymbolInfos.Count >= 1)
                 {
@@ -144,7 +144,7 @@
 
     private void OnLoadSymbolInfoTree()
     {
-        if (!AdsDataLogService.IsAdsPortReady) return;
+        if (!AdsDataLogService.IsAdsPortRun) return;
         _symbolInfoTrees = AdsDataLogService.GetSymbolInfoTree();
 
         StateHasChanged();
@@ -152,7 +152,7 @@
     
     private void LoadConfig()
     {
-        if (!AdsDataLogService.IsAdsPortReady) return;
+        if (!AdsDataLogService.IsAdsPortRun) return;
         if (_symbolInfoTrees.Count <= 0) return;
         AppConfigService.UpdateConfiguration();
         LoadAppConfig();

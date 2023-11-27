@@ -8,12 +8,12 @@ using Timer = System.Timers.Timer;
 
 namespace LabDataToolbox.Util;
 
-public class FileSaveTimer
+public class PeriodicActionTimer
 {
     private Timer _timer;
     public int TimeInterval { get; set; } = 5000;
-    public Action SaveFileAction;
-    public FileSaveTimer(Action saveFileAction) => SaveFileAction = saveFileAction;
+    public Action TimerAction { get; set; }
+    public PeriodicActionTimer(Action timerAction) => TimerAction = timerAction;
 
     public void StartTimer()
     {
@@ -32,7 +32,7 @@ public class FileSaveTimer
     private void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
         // Console.WriteLine("The Elapsed event was raised at {0:HH:mm:ss.fff}", e.SignalTime);
-        SaveFileAction();
+        TimerAction();
     }
 
 

@@ -11,6 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using BlazorComponent;
+using Masa.Blazor.Presets;
+using Microsoft.Extensions.Logging;
 
 namespace LabDataToolbox
 {
@@ -25,9 +28,28 @@ namespace LabDataToolbox
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddWpfBlazorWebView();
+            
+#if DEBUG
+            serviceCollection.AddBlazorWebViewDeveloperTools();
+            serviceCollection.AddLogging(builder =>
+            {
+                builder.SetMinimumLevel(LogLevel.None);
+            });
+#endif
+
             serviceCollection.AddMasaBlazor(options =>
             {
-                options.ConfigureIcons(IconSet.MaterialDesign);
+                options.ConfigureIcons(IconSet.FontAwesome);
+                options.Defaults = new Dictionary<string, IDictionary<string, object?>?>()
+                {
+                    {
+                        PopupComponents.SNACKBAR, new Dictionary<string, object?>()
+                        {
+                            { nameof(PEnqueuedSnackbars.Closeable), true },
+                            { nameof(PEnqueuedSnackbars.Position), SnackPosition.TopRight }
+                        }
+                    }
+                };
             });
             serviceCollection.AddSingleton<AdsDataLogService>();
             serviceCollection.AddSingleton<AppConfigService>();
