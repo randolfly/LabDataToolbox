@@ -1,4 +1,4 @@
-﻿namespace LabDataToolbox;
+﻿namespace LabDataToolbox.Model;
 
 public class SymbolInfoTree
 {

@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 
-namespace LabDataToolbox;
+namespace LabDataToolbox.Model;
 
 public class AppConfig
 {

@@ -1,0 +1,66 @@
+﻿@using LabDataToolbox.Model
+@using LabDataToolbox.Service
+<MDialog @bind-Value="_dialog" Persistent MaxWidth="600">
+    <ActivatorContent>
+        <MButton class="ma-2" Outlined @attributes="@context.Attrs" Color="teal">
+            Setting
+        </MButton>
+    </ActivatorContent>
+    <ChildContent>
+        <MCard>
+            <ChildContent>
+                <MCardTitle>
+                    <span class="text-h5">User Profile</span>
+                </MCardTitle>
+                <MCardText>
+                    <MContainer>
+                        <MRow>
+                            <MCol Cols="12">
+                                <MTextField @bind-Value="AppConfig.AdsConfig.NetId" Label="NetId" TValue="string">
+                                </MTextField>
+                            </MCol>
+                            <MCol Cols="12" Sm="6">
+                                <MTextField @bind-Value="AppConfig.AdsConfig.PortId" Label="PortId" TValue="int">
+                                </MTextField>
+                            </MCol>
+                            <MCol Cols="12" Sm="6">
+                                <MTextField @bind-Value="AppConfig.AdsConfig.Period" Label="Period" TValue="int">
+                                </MTextField>
+                            </MCol>
+                            <MCol Cols="12" Sm="6">
+                                <MTextField @bind-Value="AppConfig.DataLogConfig.DataLogFolderName" Label="Folder"
+                                    TValue="string">
+                                </MTextField>
+                            </MCol>
+                            <MCol Cols="12" Sm="6">
+                                <MTextField @bind-Value="AppConfig.DataLogConfig.DataLogFileName" Label="FileName"
+                                    TValue="string">
+                                </MTextField>
+                            </MCol>
+                        </MRow>
+                    </MContainer>
+                </MCardText>
+                <MCardActions>
+                    <MSpacer />
+                    <MButton Color="blue darken-1" Text OnClick="() => _dialog = false">
+                        Close
+                    </MButton>
+                    <MButton Color="blue darken-1" Text
+                        OnClick="() => { AppConfigService.SaveConfiguration(AppConfig); _dialog = false; }">
+                        Save
+                    </MButton>
+                </MCardActions>
+            </ChildContent>
+        </MCard>
+    </ChildContent>
+</MDialog>
+
+
+@code {
+
+    bool _dialog = false;
+
+    [Parameter]
+    public AppConfig AppConfig { get; set; }
+
+}

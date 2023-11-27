@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using LabDataToolbox.Service;
+using Masa.Blazor;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,8 +25,12 @@ namespace LabDataToolbox
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddWpfBlazorWebView();
-            serviceCollection.AddMasaBlazor();
-
+            serviceCollection.AddMasaBlazor(options =>
+            {
+                options.ConfigureIcons(IconSet.MaterialDesign);
+            });
+            serviceCollection.AddSingleton<AdsDataLogService>();
+            serviceCollection.AddSingleton<AppConfigService>();
 
             Resources.Add("services", serviceCollection.BuildServiceProvider());
         }

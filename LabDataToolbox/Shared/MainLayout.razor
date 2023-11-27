@@ -1,42 +1,25 @@
 ﻿@inherits LayoutComponentBase
-
 <MApp>
-    <MAppBar App>
-        <MAppBarNavIcon @onclick="() => _drawer = !_drawer"></MAppBarNavIcon>
-        <MToolbarTitle>LabDataToolbox</MToolbarTitle>
-        <MSpacer></MSpacer>
-        <MButton Text Color="primary" Target="_blank" Href="https://docs.masastack.com/blazor/introduction/why-masa-blazor">About</MButton>
-    </MAppBar>
+    <MNavigationDrawer App Permanent ExpandOnHover @bind-MiniVariant="_mini">
+        <div class="d-flex flex-column" style="height: inherit">
+            <MList Nav Routable Dense>
+                <MListItem Href="/" ActiveClass="primary--text">
 
-    <MNavigationDrawer App @bind-Value="_drawer">
-        <MList Nav Routable>
-            <MListItem Href="/" ActiveClass="primary--text">
-                <MListItemIcon>
-                    <MIcon>mdi-home</MIcon>
-                </MListItemIcon>
-                <MListItemContent>
-                    <MListItemTitle>Home</MListItemTitle>
-                </MListItemContent>
-            </MListItem>
-            <MListItem Href="/counter" ActiveClass="primary--text">
-                <MListItemIcon>
-                    <MIcon>mdi-plus</MIcon>
-                </MListItemIcon>
-                <MListItemContent>
-                    <MListItemTitle>Counter</MListItemTitle>
-                </MListItemContent>
-            </MListItem>
-            <MListItem Href="/fetchdata" ActiveClass="primary--text">
-                <MListItemIcon>
-                    <MIcon>mdi-list-box</MIcon>
-                </MListItemIcon>
-                <MListItemContent>
-                    <MListItemTitle>Fetch data</MListItemTitle>
-                </MListItemContent>
-            </MListItem>
-        </MList>
+                    <MListItemContent>
+                        <MListItemTitle>AdsSymbolSelect</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+            </MList>
+            <MList Nav Routable Dense Class="mt-auto">
+                <MListItem Href="/setting" ActiveClass="primary--text">
+                    <MListItemContent>
+                        <MListItemTitle>Setting</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+            </MList>
+        </div>
+
     </MNavigationDrawer>
-
     <MMain>
         <MContainer Fluid>
             <MErrorHandler>
@@ -47,7 +30,5 @@
 </MApp>
 
 @code {
-
-    private bool? _drawer;
-
+    private bool _mini = true;
 }

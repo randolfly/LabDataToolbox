@@ -1,5 +1,6 @@
-﻿namespace LabDataToolbox;
+﻿namespace LabDataToolbox.Util;
 
+using LabDataToolbox.Model;
 using TwinCAT.Ads.TypeSystem;
 
 public static class SymbolInfoHelper

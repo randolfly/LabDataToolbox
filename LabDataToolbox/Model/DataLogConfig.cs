@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.Json.Serialization;
 
-namespace LabDataToolbox;
+namespace LabDataToolbox.Model;
 
 public class DataLogConfig
 {

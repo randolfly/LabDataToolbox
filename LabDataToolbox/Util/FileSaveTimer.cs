@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
-namespace LabDataToolbox;
+namespace LabDataToolbox.Util;
 
 public class FileSaveTimer
 {
