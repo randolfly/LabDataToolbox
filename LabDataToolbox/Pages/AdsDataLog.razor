@@ -3,6 +3,7 @@
 @using LabDataToolbox.Util
 @using Microsoft.Extensions.Logging
 @using System.Diagnostics
+@using LabDataToolbox.Config
 @inject IPopupService PopupService
 @inject AppConfigService AppConfigService
 @inject AdsDataLogService AdsDataLogService
@@ -11,19 +12,19 @@
 
 
 <MCard Style="height:100%">
-    <MCardTitle Class="text-center justify-center py-6">
-        <h4 class="font-weight-bold text-h4">数据存储</h4>
-    </MCardTitle>
+    @* <MCardTitle Class="text-center justify-center py-6"> *@
+    @*     <h4 class="font-weight-bold text-h4">数据存储</h4> *@
+    @* </MCardTitle> *@
     <MTabs @bind-Value="_tabs" Centered Grow>
         <MTab>
             <MCol>
-                <MIcon>fas fa-home</MIcon>
+                <MIcon Icon="@("mdi-connection")"/>
                 倍福连接配置
             </MCol>
         </MTab>
         <MTab>
             <MCol>
-                <MIcon>fas fa-home</MIcon>
+                <MIcon Icon="@("mdi-content-save")"/>
                 数据记录配置
             </MCol>
         </MTab>
@@ -36,45 +37,40 @@
                     <MContainer>
                         <MRow>
                             <MCol Cols="12">
-                                <MTextField @bind-Value="AppConfig.AdsConfig.NetId" Label="NetId" TValue="string">
+                                <MTextField @bind-Value="AdsConfig.NetId" Label="NetId" TValue="string">
                                 </MTextField>
                             </MCol>
                             <MCol Cols="12" Sm="6">
-                                <MTextField @bind-Value="AppConfig.AdsConfig.PortId" Label="PortId" TValue="int">
+                                <MTextField @bind-Value="AdsConfig.PortId" Label="PortId" TValue="int">
                                 </MTextField>
                             </MCol>
                             <MCol Cols="12" Sm="6">
-                                <MTextField @bind-Value="AppConfig.AdsConfig.Period" Label="Period" TValue="int">
+                                <MTextField @bind-Value="AdsConfig.Period" Label="Period" TValue="int">
                                 </MTextField>
                             </MCol>
                             <MCol Cols="12" Sm="6">
-                                <MTextField @bind-Value="AppConfig.DataLogConfig.DataLogFolderName" Label="Folder"
+                                <MTextField @bind-Value="DataLogConfig.DataLogFolderName" Label="Folder"
                                             TValue="string">
                                 </MTextField>
                             </MCol>
                             <MCol Cols="12" Sm="6">
-                                <MTextField @bind-Value="AppConfig.DataLogConfig.DataLogFileName" Label="FileName"
+                                <MTextField @bind-Value="DataLogConfig.DataLogFileName" Label="FileName"
                                             TValue="string">
                                 </MTextField>
                             </MCol>
+                            <MCol Cols="12"
+                                  Sm="6">
+                                <MSelect @bind-Value="DataLogConfig.DataExportTypes"
+                                         Items="DefaultConfig.DataExportTypes"
+                                         Chips
+                                         ItemText="u => u"
+                                         ItemValue="u => u"
+                                         Label="DataExportType"
+                                         Multiple>
+                                </MSelect>
+                            </MCol>
                         </MRow>
-                        <MRow Align="AlignTypes.Center">
 
-                            <Lamp Status=@_isAdsConnected Name="倍福连接" Description="录数程序是否连接倍福Ads主机"></Lamp>
-
-                            <MSpacer></MSpacer>
-
-                            <MButton Flat Dark Color="primary"
-                                     OnClick="OnConnectAdsServer"
-                                     Style="margin-right: 5px;">
-                                连接倍福
-                            </MButton>
-
-                            <MButton Flat Dark Color="red"
-                                     OnClick="OnDisconnectAdsServer">
-                                断连倍福
-                            </MButton>
-                        </MRow>
                     </MContainer>
                 </MCardText>
 
@@ -83,22 +79,100 @@
         </MTabItem>
         <MTabItem>
             <MCard Flat>
-                <MCardTitle Class="text-h5">
-                    An even better title
-                </MCardTitle>
                 <MCardText>
-                    <p>
-                        Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra
-                        felis
-                        nunc et lorem. Sed hendrerit. Maecenas malesuada. Vestibulum ullamcorper mauris at ligula.
-                        Proin
-                        faucibus arcu quis ante.
-                    </p>
+                    <MContainer>
+                        <MRow>
+                            <MCol>
+                                <MTextField AppendIcon="@("mdi-magnify")" Label="Search Ads Symbols" @bind-Value="_search">
+                                </MTextField>
+                            </MCol>
+                        </MRow>
+                        @if (_symbolInfoTrees.Count > 0)
+                        {
+                            <MRow>
+                                <MCol Cols="12" Md="6">
+                                    <MCard Class="mx-auto">
+                                        <MTreeview Id="symbolInfoTree" TItem="SymbolInfoTree" TKey="SymbolInfo"
+                                                   @bind-Value="_recordSymbolInfos"
+                                                   Selectable
+                                                   Filter="RecordSymbolInfoFilter" Search="@_search"
+                                                   Items="_symbolInfoTrees"
+                                                   ItemText="r => r.SymbolInfo.Path"
+                                                   ItemChildren="r => r.Children"
+                                                   ItemKey="r => r.SymbolInfo">
+                                        </MTreeview>
+                                    </MCard>
+                                </MCol>
+                                <MCol Cols="12" Md="6">
+                                    <MCard Class="mx-auto">
+                                        <MList Dense>
+                                            <MListItemGroup
+                                                @bind-Values="GraphSymbolInfoName"
+                                                Multiple
+                                                Color="indigo">
+                                                @foreach (var symbol in _recordSymbolInfos)
+                                                {
+                                                    <MListItem @key="symbol" Value="symbol.Path">
+                                                        <MListItemContent>
+                                                            <MListItemTitle>@symbol.Path</MListItemTitle>
+                                                        </MListItemContent>
+                                                    </MListItem>
+                                                }
+                                            </MListItemGroup>
+                                        </MList>
+                                    </MCard>
+                                </MCol>
+                            </MRow>
+                        }
 
-                    <p class="mb-0">
-                        Etiam vitae tortor. Curabitur ullamcorper ultricies nisi. Sed magna purus, fermentum eu,
-                        tincidunt eu, varius ut, felis. Aliquam lobortis. Suspendisse potenti.
-                    </p>
+                        <MRow Justify="JustifyTypes.SpaceAround">
+
+                            <MCol Cols="4" Class="d-flex justify-center">
+                                <MButton Flat Dark  OnClick="OnConnectAdsServer"
+                                         Color=@(_isAdsConnected ? "green" : "red")
+                                         Style="margin-right: 5px;">
+                                    <MIcon Left Icon="@("mdi-connection")"/>
+                                    @(_isAdsConnected ? "断连倍福" : "连接倍福")
+                                </MButton>
+                            </MCol>
+                            <MCol Cols="4" Class="d-flex justify-center">
+                                <MButton Flat Dark Color="primary"
+                                         OnClick="OnLoadSymbolInfoTree"
+                                         Style="margin-right: 5px;">
+                                    <MIcon Left Icon="@("mdi-file-tree")"/>
+                                    读取变量树
+                                </MButton>
+                            </MCol>
+                            <MCol Cols="4" Class="d-flex justify-center">
+                                <MButton Flat Dark
+                                         Color=@(_isAdsLogging ? "green" : "red")
+                                         OnClick="OnAdsLog"
+                                         Style="margin-right: 5px;">
+                                    <MIcon Icon="@("mdi-arrow-right-drop-circle")"/>
+                                    @(_isAdsLogging ? "停止记录" : "开始记录")
+                                </MButton>
+                            </MCol>
+                            <MCol Cols="4" Class="d-flex justify-center">
+                                <Lamp Status=@_isAdsConnected Name=@(_isAdsConnected ? "已连接" : "未连接") Description="录数程序是否连接倍福Ads主机，橙色代表未连接，绿色代表已连接"></Lamp>
+                            </MCol>
+                            <MCol Cols="4" Class="d-flex justify-center">
+                                <MButton Flat Dark Color="primary"
+                                         OnClick="OnSaveConfig"
+                                         Style="margin-right: 5px;">
+                                    <MIcon Icon="@("mdi-content-save")"/>
+                                    保存配置
+                                </MButton>
+                            </MCol>
+                            <MCol Cols="4" Class="d-flex justify-center">
+                                <MButton Flat Dark Color="primary"
+                                         OnClick="OnLoadConfig"
+                                         Style="margin-right: 5px;">
+                                    <MIcon Icon="@("mdi-upload")"/>
+                                    读取配置
+                                </MButton>
+                            </MCol>
+                        </MRow>
+                    </MContainer>
                 </MCardText>
             </MCard>
         </MTabItem>
@@ -109,17 +183,34 @@
 
     public StringNumber _tabs;
     private bool _isAdsConnected;
+    private bool _isAdsLogging;
+    private string _search = string.Empty;
 
     private AppConfig AppConfig { get; set; }
     private AdsConfig AdsConfig { get; set; }
     private DataLogConfig DataLogConfig { get; set; }
 
-    
+    private List<SymbolInfoTree> _symbolInfoTrees = new();
+
+    private List<SymbolInfo> _recordSymbolInfos = new();
+    private List<SymbolInfo> _graphSymbolInfos = new();
+
+    private List<StringNumber> _graphSymbolInfoName = new();
+
+    private List<StringNumber> GraphSymbolInfoName
+    {
+        get => _graphSymbolInfoName;
+        set
+        {
+            OnGraphSymbolInfosChanged(value);
+            _graphSymbolInfoName = value;
+        }
+    }
+
     protected override void OnInitialized()
     {
         LoadAppConfig();
         PopupService.EnqueueSnackbarAsync("初始化完成");
-
     }
 
     private void OnConnectAdsServer()
@@ -127,33 +218,126 @@
         if (!_isAdsConnected)
         {
             AdsDataLogService.ConnectAdsServer();
-        }
-
-        if (AdsDataLogService.IsAdsPortRun)
-        {
-            _isAdsConnected = true;
-            PopupService.EnqueueSnackbarAsync("倍福主机和录数程序已连接");
+            if (AdsDataLogService.IsAdsPortRun)
+            {
+                _isAdsConnected = true;
+                PopupService.EnqueueSnackbarAsync("倍福主机和录数程序已连接");
+            }
+            else
+            {
+                PopupService.EnqueueSnackbarAsync("请确认倍福是否Login并启动");
+            }
         }
         else
         {
-            PopupService.EnqueueSnackbarAsync("请确认倍福是否Login并启动");
+            if (AdsDataLogService.IsAdsPortRun)
+            {
+                AdsDataLogService.DisconnectAdsServer();
+            }
+            else
+            {
+                PopupService.EnqueueSnackbarAsync("请确认倍福是否Login并启动");
+            }
+            _isAdsConnected = false;
         }
     }
 
-    private void OnDisconnectAdsServer()
+    private void OnLoadSymbolInfoTree()
     {
-        if (!_isAdsConnected)
-        {
-            PopupService.EnqueueSnackbarAsync("请先连接倍福主机和录数程序");
-            return;
-        }
-        ;
-        AdsDataLogService.DisconnectAdsServer();
-        _isAdsConnected = false;
+        if (!_isAdsConnected) return;
+        _symbolInfoTrees = AdsDataLogService.GetSymbolInfoTree();
+
+        StateHasChanged();
     }
 
+    private void OnGraphSymbolInfosChanged(List<StringNumber> symbolInfoPaths)
+    {
+        _graphSymbolInfos = new List<SymbolInfo>();
+        foreach (var symbolId in symbolInfoPaths)
+        {
+            var changedSymbolInfo = _recordSymbolInfos.First(s => s.Path.Equals(symbolId.AsT0,
+                StringComparison.CurrentCultureIgnoreCase));
+            if (!_graphSymbolInfos.Contains(changedSymbolInfo)) _graphSymbolInfos.Add(changedSymbolInfo);
+        }
+
+        SaveDataLogSymbolInfo();
+    }
+
+    private Func<SymbolInfoTree, string, Func<SymbolInfoTree, string>, bool> RecordSymbolInfoFilter
+    {
+        get
+        {
+            return (item, search, textKey) => textKey(item).IndexOf(search,
+                StringComparison.CurrentCultureIgnoreCase) > -1;
+        }
+    }
+
+    private async Task OnAdsLog()
+    {
+        if (!_isAdsLogging)
+        {
+            if (AdsDataLogService.IsAdsPortRun)
+            {
+                if (_recordSymbolInfos.Count >= 1)
+                {
+                    AdsDataLogService.RegisterNotification();
+                    _isAdsLogging = true;
+                }
+            }
+        }
+        else
+        {
+            await AdsDataLogService.UnregisterNotification(
+                AppConfigService.AppConfig.DataLogConfig.RecordFileFullName);
+            _isAdsLogging = false;
+        }
+    }
+
+    private void OnLoadConfig()
+    {
+        if (!_isAdsConnected) return;
+        if (_symbolInfoTrees.Count <= 0) return;
+        AppConfigService.UpdateConfiguration();
+        LoadAppConfig();
+
+        var symbolInfos = new List<SymbolInfo>();
+        foreach (var symbolInfoTree in _symbolInfoTrees)
+        {
+            symbolInfos.AddRange(symbolInfoTree.ConvertToSymbolInfo());
+        }
+        _recordSymbolInfos = symbolInfos.Where(
+            symbolInfo =>
+                DataLogConfig.RecordAdsSymbolName.Contains(symbolInfo.Path, StringComparer.CurrentCultureIgnoreCase)
+            ).ToList();
+
+        _graphSymbolInfos = _recordSymbolInfos.Where(
+            symbolInfo =>
+                DataLogConfig.GraphAdsSymbolName.Contains(symbolInfo.Path, StringComparer.CurrentCultureIgnoreCase))
+            .ToList();
+
+        GraphSymbolInfoName.Clear();
+        _graphSymbolInfos.ForEach(info => { GraphSymbolInfoName.Add(info.Path); });
+
+        StateHasChanged();
+        SaveDataLogSymbolInfo();
+    }
+
+    private void OnSaveConfig()
+    {
+        var recordSymbolInfoName = _recordSymbolInfos.Select(s => s.Path).ToList();
+        var graphSymbolInfoName = _graphSymbolInfos.Select(s => s.Path).ToList();
+        DataLogConfig.GraphAdsSymbolName = graphSymbolInfoName;
+        DataLogConfig.RecordAdsSymbolName = recordSymbolInfoName;
+        AppConfigService.SaveConfiguration(AppConfig);
+    }
 
     #region Helper Functions
+
+    private void SaveDataLogSymbolInfo()
+    {
+        AdsDataLogService.RecordSymbolInfos = _recordSymbolInfos;
+        AdsDataLogService.GraphSymbolInfos = _graphSymbolInfos;
+    }
 
     private void LoadAppConfig()
     {

@@ -5,6 +5,9 @@
 // @Date: 2023-07-28 19:20
 // @Modify:
 
+using MathNet.Numerics.Data.Matlab;
+using MathNet.Numerics.LinearAlgebra;
+
 namespace LabDataToolbox.Service;
 
 using BlazorComponent;
@@ -35,7 +38,7 @@ public class AdsDataLogService : IDisposable
 
     private AppConfigService AppConfigService { get; set; }
     private bool IsAdsConnected => AdsClient.IsConnected;
-    
+
     public bool IsAdsPortRun
     {
         get
@@ -128,7 +131,10 @@ public class AdsDataLogService : IDisposable
         }
 
         AdsClient.AdsNotification -= AdsNotificationHandler;
-        await ExportCsvLog(logDataFullName);
+        foreach (var exportType in AppConfigService.AppConfig.DataLogConfig.DataExportTypes)
+        {
+            await ExportLog(logDataFullName + "." + exportType, exportType);
+        }
         PeriodicActionTimer.StopTimer();
     }
 
@@ -144,7 +150,7 @@ public class AdsDataLogService : IDisposable
         for (var i = 0; i < symbols.Count; i++)
         {
             var symbol = (Symbol)symbols[i];
-            // if (symbol.InstanceName is not ("MAIN" or "GVL")) continue;
+            if (symbol.InstanceName is not ("MAIN" or "GVL")) continue;
             symbolInfoTreeList.Add(new SymbolInfoTree());
             var symbolInfoTree = symbolInfoTreeList[symbolIndex];
             symbolIndex++;
@@ -228,6 +234,25 @@ public class AdsDataLogService : IDisposable
         ExportCsvTempWithHeader = false;
     }
 
+    private async Task ExportLog(string logDataFullName, string exportType)
+    {
+        switch (exportType)
+        {
+            case "csv":
+                await ExportCsvLog(logDataFullName);
+                break;
+            case "mat":
+                await ExportMatLog(logDataFullName);
+                break;
+        }
+    }
+
+    private async Task ExportMatLog(string logDataFullName)
+    {
+        var exportMatDict = GetRecordMatDict();
+        await Task.Run(() => MatlabWriter.Write(logDataFullName, exportMatDict));
+    }
+
     private async Task ExportCsvLog(string logDataFullName)
     {
         var recordString = GetRecordString();
@@ -265,5 +290,18 @@ public class AdsDataLogService : IDisposable
         for (var i = 0; i < maxLength; i++)
             sb.AppendLine($"{string.Join(',', RecordData.Select(d => d[i].ToString(CultureInfo.InvariantCulture)))}");
         return sb.ToString();
+    }
+
+    private Dictionary<string, Matrix<double>> GetRecordMatDict()
+    {
+        var exportMatDict = new Dictionary<string, Matrix<double>>();
+        var maxLength = RecordData.Where(d => d.Count > 0).Select(d => d.Count).Min();
+        for (var i = 0; i < RecordSymbolInfos.Count; i++)
+        {
+            exportMatDict.Add(RecordSymbolInfos[i].Path.Replace(".", "_"),
+                Matrix<double>.Build.Dense(maxLength, 1, RecordData[i].Take(maxLength).ToArray()));
+        }
+
+        return exportMatDict;
     }
 }

@@ -39,14 +39,15 @@ namespace LabDataToolbox
 
             serviceCollection.AddMasaBlazor(options =>
             {
-                options.ConfigureIcons(IconSet.FontAwesome);
+                options.ConfigureIcons(IconSet.MaterialDesignIcons);
                 options.Defaults = new Dictionary<string, IDictionary<string, object?>?>()
                 {
                     {
                         PopupComponents.SNACKBAR, new Dictionary<string, object?>()
                         {
+                            {nameof(PEnqueuedSnackbars.Timeout), 1500},
                             { nameof(PEnqueuedSnackbars.Closeable), true },
-                            { nameof(PEnqueuedSnackbars.Position), SnackPosition.TopRight }
+                            { nameof(PEnqueuedSnackbars.Position), SnackPosition.BottomCenter }
                         }
                     }
                 };

@@ -6,10 +6,13 @@
       <ImplicitUsings>enable</ImplicitUsings>
       <UseWPF>true</UseWPF>
       <RootNamespace>LabDataToolbox</RootNamespace>
+      <ApplicationIcon>软盘.svg</ApplicationIcon>
     </PropertyGroup>
 
      <ItemGroup>
        <PackageReference Include="Masa.Blazor" Version="1.0.2" />
+       <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+       <PackageReference Include="MathNet.Numerics.Data.Matlab" Version="5.0.0" />
        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="7.0.81" />
        <PackageReference Include="Beckhoff.TwinCAT.Ads" Version="6.1.125" />
        <PackageReference Include="ScottPlot.WPF" Version="4.1.68" />
@@ -23,6 +26,10 @@
 
      <ItemGroup>
        <Folder Include="Service\" />
+     </ItemGroup>
+
+     <ItemGroup>
+       <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
      </ItemGroup>
 
 </Project>

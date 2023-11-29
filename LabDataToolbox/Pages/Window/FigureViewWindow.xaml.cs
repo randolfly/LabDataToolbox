@@ -36,10 +36,10 @@ public partial class FigureViewWindow : System.Windows.Window
         SignalPlot = FigureView.Plot.AddSignal(LogData);
 
         FigureView.Plot.XAxis.TickLabelFormat(CustomTickFormatter);
-        Crosshair = FigureView.Plot.AddCrosshair(0, 0);
-        FigureView.MouseMove += OnMouseMove;
-        FigureView.MouseEnter += OnMouseEnter;
-        FigureView.MouseLeave += OnMouseLeave;
+        // Crosshair = FigureView.Plot.AddCrosshair(0, 0);
+        // FigureView.MouseMove += OnMouseMove;
+        // FigureView.MouseEnter += OnMouseEnter;
+        // FigureView.MouseLeave += OnMouseLeave;
         FigureView.Refresh();
 
         // create a timer to update the GUI
@@ -54,7 +54,7 @@ public partial class FigureViewWindow : System.Windows.Window
 
     private int MaxRenderLength { get; set; } = 2_000;
 
-    private Crosshair Crosshair { get; }
+    // private Crosshair Crosshair { get; }
     private SignalPlot SignalPlot { get; set; }
 
     private void UpdateFigure(object sender, EventArgs e)
@@ -101,28 +101,28 @@ public partial class FigureViewWindow : System.Windows.Window
     }
 
 
-    private void OnMouseMove(object sender, MouseEventArgs e)
-    {
-        // var pixelX = (int)e.MouseDevice.GetPosition(FigureView).X;
-        // var pixelY = (int)e.MouseDevice.GetPosition(FigureView).Y;
+    // private void OnMouseMove(object sender, MouseEventArgs e)
+    // {
+    //     // var pixelX = (int)e.MouseDevice.GetPosition(FigureView).X;
+    //     // var pixelY = (int)e.MouseDevice.GetPosition(FigureView).Y;
+    //
+    //     var (coordinateX, coordinateY) = FigureView.GetMouseCoordinates();
+    //
+    //     Crosshair.X = coordinateX;
+    //     Crosshair.Y = coordinateY;
+    //
+    //     FigureView.Refresh();
+    // }
 
-        var (coordinateX, coordinateY) = FigureView.GetMouseCoordinates();
+    // private void OnMouseEnter(object sender, MouseEventArgs e)
+    // {
+    //     Crosshair.IsVisible = true;
+    // }
 
-        Crosshair.X = coordinateX;
-        Crosshair.Y = coordinateY;
-
-        FigureView.Refresh();
-    }
-
-    private void OnMouseEnter(object sender, MouseEventArgs e)
-    {
-        Crosshair.IsVisible = true;
-    }
-
-    private void OnMouseLeave(object sender, MouseEventArgs e)
-    {
-        Crosshair.IsVisible = false;
-    }
+    // private void OnMouseLeave(object sender, MouseEventArgs e)
+    // {
+    //     Crosshair.IsVisible = false;
+    // }
 
     public void CloseWindow()
     {

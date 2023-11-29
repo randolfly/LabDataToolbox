@@ -19,7 +19,7 @@ public class AppConfigService
         UpdateConfiguration();
     }
 
-    public AppConfig AppConfig { get; set; } = new();
+    public AppConfig AppConfig { get; private set; } = new();
 
     public static void SaveConfiguration(AppConfig appConfig)
     {

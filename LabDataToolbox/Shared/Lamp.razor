@@ -1,15 +1,19 @@
 ﻿<MTooltip Bottom>
     <ActivatorContent>
 
-        <div @attributes="@context.Attrs" style="margin-right: 5px;">
-            <MLabel >
-                @Name
-            </MLabel>
-
-            <MAvatar Color=@Color>
+        <MChip Class="ma-2"
+               Color=@Color
+               Dark
+               @attributes="@context.Attrs"
+               Label>
+            <MAvatar Left>
+                <MIcon >
+                    mdi-connection
+                </MIcon>
             </MAvatar>
-        </div>
+            @Name
 
+        </MChip>
     </ActivatorContent>
     <ChildContent>
         <span>@Description</span>
@@ -27,5 +31,5 @@
     [Parameter]
     public string Description { get; set; }
 
-    private string Color => Status ? "green" : "red";
+    private string Color => Status ? "green lighten-2" : "amber darken-3";
 }
