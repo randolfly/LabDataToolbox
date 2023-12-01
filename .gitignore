@@ -561,3 +561,7 @@ coverage*[.json, .xml, .info]
 
 # End of https://www.toptal.com/developers/gitignore/api/vs,cSharp
 
+
+!LabDataToolbox/Properties
+!LabDataToolbox/Properties/PublishProfiles
+!LabDataToolbox/Properties/PublishProfiles/*
