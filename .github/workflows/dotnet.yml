@@ -6,6 +6,8 @@ name: .NET
 on:
   push:
     branches: [ "master" ]
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
   pull_request:
     branches: [ "master" ]
 
@@ -26,3 +28,17 @@ jobs:
       run: dotnet build --no-restore
     - name: Publish
       run: dotnet publish -p:PublishProfile=ClickOnceProfile
+    - name: Zip the Build
+      run: zip -r LabDataToolbox-publish.zip ./src/LabDataToolbox/bin/publish/
+    - name: Create Release and Upload Release Asset
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        tag_name: ${{ github.ref }}
+        name: Release ${{ github.ref }}
+        body: TODO New Release.
+        draft: false
+        prerelease: false
+        files: |
+          LabDataToolbox-publish.zip
+          LICENSE 
